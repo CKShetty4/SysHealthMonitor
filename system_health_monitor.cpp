@@ -1,8 +1,10 @@
+#include <cstring>
 #include <iostream>
+
 #include <string>
-#include <cstdio>
+
 #include <sys/statvfs.h>
-// #include <unistd.h>
+#include <unistd.h>
 
 float getCPUUsage() {
     std::string command = "top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | awk -F. '{print $1}'";
@@ -41,15 +43,48 @@ int getActiveProcesses() {
     return activeProcesses;
 }
 
+// Function to send email alert using mailx
+void sendEmailAlert(const std::string& subject, const std::string& body) {
+    std::string command = "echo '" + body + "' | mailx -s '" + subject + "' dev.ckshetty@gmail.com";
+    if (system(command.c_str()) != 0) {
+        std::cerr << "Error sending email alert: " << strerror(errno) << std::endl;
+    } else {
+        std::cout << "Email alert sent successfully!" << std::endl;
+    }
+}
+
 int main() {
-    std::cout << "System Health Monitor" << std::endl;
+    // Set thresholds
+    float cpuThreshold = 80.0;
+    float memoryThreshold = 80.0;
+    float diskSpaceThreshold = 80.0;
+    int activeProcessesThreshold = 100;
+
+    // Monitor system health
     float cpuUsage = getCPUUsage();
-    std::cout << "CPU Usage: " << cpuUsage << "%" << std::endl;
     float memoryUsage = getMemoryUsage();
-    std::cout << "Memory Usage: " << memoryUsage << "%" << std::endl;
     float diskSpaceUsage = getDiskSpaceUsage();
-    std::cout << "Disk Space Usage: " << diskSpaceUsage << "%" << std::endl;
     int activeProcesses = getActiveProcesses();
+
+    // Print system health information
+    std::cout << "CPU Usage: " << cpuUsage << "%" << std::endl;
+    std::cout << "Memory Usage: " << memoryUsage << "%" << std::endl;
+    std::cout << "Disk Space Usage: " << diskSpaceUsage << "%" << std::endl;
     std::cout << "Active Processes: " << activeProcesses << std::endl;
+
+    // Send email alerts if thresholds are exceeded
+    if (cpuUsage > cpuThreshold) {
+        sendEmailAlert("CPU Usage Alert", "CPU usage exceeded " + std::to_string(cpuThreshold) + "%");
+    }
+    if (memoryUsage > memoryThreshold) {
+        sendEmailAlert("Memory Usage Alert", "Memory usage exceeded " + std::to_string(memoryThreshold) + "%");
+    }
+    if (diskSpaceUsage > diskSpaceThreshold) {
+        sendEmailAlert("Disk Space Alert", "Disk space usage exceeded " + std::to_string(diskSpaceThreshold) + "%");
+    }
+    if (activeProcesses > activeProcessesThreshold) {
+        sendEmailAlert("Active Processes Alert", "Active processes exceeded " + std::to_string(activeProcessesThreshold));
+    }
+
     return 0;
 }
