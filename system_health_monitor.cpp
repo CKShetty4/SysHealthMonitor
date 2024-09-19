@@ -27,9 +27,12 @@ float getMemoryUsage() {
 }
 
 float getDiskSpaceUsage() {
-    struct statvfs buf;
-    statvfs("/", &buf);
-    float diskSpaceUsage = (buf.f_blocks - buf.f_bfree) * 100.0 / buf.f_blocks;
+    std::string command = "df -h --output=pcent / | awk '{print $1}' | sed 's/%//g'";
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) return -1.0;
+    float diskSpaceUsage;
+    fscanf(pipe, "%f", &diskSpaceUsage);
+    pclose(pipe);
     return diskSpaceUsage;
 }
 
