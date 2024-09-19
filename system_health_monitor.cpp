@@ -2,7 +2,7 @@
 #include <string>
 #include <cstdio>
 #include <sys/statvfs.h>
-#include <unistd.h>
+// #include <unistd.h>
 
 float getCPUUsage() {
     std::string command = "top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | awk -F. '{print $1}'";
@@ -31,6 +31,16 @@ float getDiskSpaceUsage() {
     return diskSpaceUsage;
 }
 
+int getActiveProcesses() {
+    std::string command = "ps -ef | wc -l";
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) return -1;
+    int activeProcesses;
+    fscanf(pipe, "%d", &activeProcesses);
+    pclose(pipe);
+    return activeProcesses;
+}
+
 int main() {
     std::cout << "System Health Monitor" << std::endl;
     float cpuUsage = getCPUUsage();
@@ -39,5 +49,7 @@ int main() {
     std::cout << "Memory Usage: " << memoryUsage << "%" << std::endl;
     float diskSpaceUsage = getDiskSpaceUsage();
     std::cout << "Disk Space Usage: " << diskSpaceUsage << "%" << std::endl;
+    int activeProcesses = getActiveProcesses();
+    std::cout << "Active Processes: " << activeProcesses << std::endl;
     return 0;
 }
