@@ -12,9 +12,22 @@ float getCPUUsage() {
     return cpuUsage;
 }
 
+float getMemoryUsage() {
+    std::string command = "free -m | awk 'NR==2{printf \"%s\", $3*100/$2 }'";
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) return -1.0;
+    float memoryUsage;
+    fscanf(pipe, "%f", &memoryUsage);
+    pclose(pipe);
+    return memoryUsage;
+}
+
+
 int main() {
     std::cout << "System Health Monitor" << std::endl;
     float cpuUsage = getCPUUsage();
     std::cout << "CPU Usage: " << cpuUsage << "%" << std::endl;
+    float memoryUsage = getMemoryUsage();
+    std::cout << "Memory Usage: " << memoryUsage << "%" << std::endl;
     return 0;
 }
