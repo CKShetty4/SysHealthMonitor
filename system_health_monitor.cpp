@@ -66,11 +66,15 @@ int main() {
     float diskSpaceUsage = getDiskSpaceUsage();
     int activeProcesses = getActiveProcesses();
 
-    // Print system health information
+    // Print system health information in a dashboard format
+    std::cout << "System Health Dashboard:" << std::endl;
+    std::cout << "------------------------" << std::endl;
     std::cout << "CPU Usage: " << cpuUsage << "%" << std::endl;
     std::cout << "Memory Usage: " << memoryUsage << "%" << std::endl;
     std::cout << "Disk Space Usage: " << diskSpaceUsage << "%" << std::endl;
     std::cout << "Active Processes: " << activeProcesses << std::endl;
+    std::cout << "------------------------" << std::endl;
+
 
     // Send email alerts if thresholds are exceeded
     if (cpuUsage > cpuThreshold) {
